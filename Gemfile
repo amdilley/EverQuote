@@ -5,6 +5,11 @@ ruby '2.0.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.7'
 
+# Heroku compliance
+group :production do
+  gem 'rails_12factor', '0.0.2'
+end
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
@@ -31,10 +36,6 @@ gem 'evernote_oauth'
 
 # XML parsing
 gem 'nokogiri'
-
-# Heroku compliance
-gem 'rails_12factor', group: :production
-gem 'aws-sdk'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
