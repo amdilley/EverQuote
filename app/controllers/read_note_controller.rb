@@ -1,10 +1,12 @@
+require 'net/http'
+
 class ReadNoteController < ApplicationController
   QUOTE_BOOK_GUID = 'c00de376-55ed-46d1-b914-d13ff30f34e3'
 
   def quote_from_xml xml_string
     xml_doc = Nokogiri::XML xml_string
 
-    quotes = xml_doc.xpath('//li')
+    quotes = xml_doc.xpath('//li/text()')
     index  = rand(quotes.length)
     quote  = quotes[index].to_s
   end
@@ -28,9 +30,27 @@ class ReadNoteController < ApplicationController
   end
 
   def push_note
-    note    = get_random_note
+    @note = get_random_note
 
-    render :json => note
+    uri = URI('https://api.pushbullet.com/v2/pushes')
+    req = Net::HTTP::Post.new(uri)
 
+    req['Authorization'] = "Bearer #{PUSH_BULLET_TOKEN}"
+    req.set_form_data(
+        'channel_tag' => 'everquote',
+        'type'        => 'note',
+        'title'       => @note[:title],
+        'body'        => @note[:content]
+      )
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    res = http.start do |h|
+      h.request(req)
+    end
+
+    render :json => nil, :status => :ok
   end
 end
